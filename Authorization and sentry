@@ -16,7 +16,10 @@
 
 
 ## On terminal
-
+sudo addgroup dev
+sudo addgroup tester
+sudo adduser usera
+sudo adduser userc
 hdfs dfs -mkdir -p /data/userc
 hdfs dfs -chown userc:dev /data/userc
 hdfs dfs -ls /data
@@ -26,6 +29,7 @@ hdfs dfs -getfacl /data/userc
 hdfs dfs -setfacl -m user:usera:r-x /data/userc
 hdfs dfs -setfacl -m group:testers:rwx /data/userc
 hdfs dfs -getfacl /data/userc
+hdfs dfs -ls /data
 
 hdfs dfs -chmod 750 /data/userc
 hdfs dfs -getfacl /data/userc
@@ -53,8 +57,8 @@ hdfs dfs -setfacl [-R] [-b|-k -m|-x <acl_spec> <path>]|[--set <acl_spec> <path>]
 ## Enabling sticky bits
 
 hdfs dfs -chmod +t /data
-hdfs dfs -ls / | grep data
-
+hdfs dfs -ls /
+hdfs dfs -chmod -t /data
 
 
 
@@ -65,7 +69,7 @@ hdfs dfs -ls / | grep data
 
 
 ## In KDC add principal for hive
-
+on cm node
 sudo kadmin.local
 addprinc hive
 quit
@@ -76,7 +80,7 @@ quit
 kinit -p user1
 
 $ beeline
-beeline> !connect jdbc:hive2://ip-172-31-64-242.ec2.internal:10000/default;principal=hive/ip-172-31-64-242.ec2.internal@HADOOP.COM
+beeline> !connect jdbc:hive2://ip-172-31-20-152.ec2.internal:10000/default;principal=hive/ip-172-31-20-152.ec2.internal@HADOOP.COM
 
 create database database1;
 
@@ -123,7 +127,7 @@ create database database1;
 kdestroy
 
 
-kinit hive
+kinit -p hive
 
 beeline
 beeline> !connect jdbc:hive2://ip-172-31-64-242.ec2.internal:10000/default;principal=hive/ip-172-31-64-242.ec2.internal@HADOOP.COM
@@ -135,7 +139,7 @@ grant role admin_role to group hive;
 show tables;
 
 
-create table test(a string);
+create table +test(a string);
 create table sample1(name string, phone int);
 create table sample2(name string, phone int);
 
@@ -145,15 +149,14 @@ grant role analyst to group userb;
 
 
 create role developer;
-grant select on sample2 to role developer;
+grant select on table sample2 to role developer;
 grant role developer to group user2;
 
+## Go to Terminal of hue node
+Create userb and user2 on that node
 
 ## Go to CM -> Hue webUI
 Create userb and user2 in Hue
 
 Try logging in as userb then as user2
 Go to hive interface
-
-
-
