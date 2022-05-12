@@ -6,51 +6,51 @@
 ## Install kerberos KDC and Admin server
 ## On Cm host install kdc and admin server
 
-$ sudo apt-get install -y rng-tools
+sudo apt-get install -y rng-tools
 
-$ sudo apt install krb5-kdc krb5-admin-server
-
-For realm give : HADOOP.COM
+sudo apt install krb5-kdc krb5-admin-server
+Default Kerberos realm : HADOOP.COM
 Kerberos server for your realm : <private-dns-of-cm>
+Administrative server for your realm : <private-dns-of-cm>
 
-$ sudo krb5_newrealm
+sudo krb5_newrealm
 
 ## Check the krb5.conf
 nano /etc/krb5.conf
 
+## Check kdc.conf for kdc configurations
+nano /usr/share/doc/krb5-kdc/examples/kdc.conf
 
-$ sudo kadmin.local
-addprinc cm/admin
-quit
+## Add a principal
+
+kadmin
+sudo kadmin.local
+kadmin.local: addprinc user1
+kadmin.local: addprinc cm/admin
+kadmin.local: exit
+
+## configure cm/admin to give all privilages
 
 sudo nano /etc/krb5kdc/kadm5.acl
 cm/admin@HADOOP.COM        *
 
 sudo /etc/init.d/krb5-admin-server restart
 
+## Intall kerberos on all clients nodes
 
+sudo apt-get install krb5-user libpam-krb5 libpam-ccreds auth-client-config -y
 
-sudo kadmin.local
-addprinc user1
-
-## Check kdc.conf for kdc configurations
-
-/usr/share/doc/krb5-kdc/examples/kdc.conf
-
-
-
-## Intall kerberos clients
-
-
-sudo apt-get install krb5-user libpam-krb5 libpam-ccreds auth-client-config
+Default Kerberos realm : HADOOP.COM
+Kerberos server for your realm : <private-dns-of-cm>
+Administrative server for your realm : <private-dns-of-cm>
 
 Note : Provide the KDC realm and servers hostname properly
 
-
+## Checking if it works by acquiring TGT
 kinit -p user1
-
 klist
 
+## Integrate Kerberose with CM
 
 #### Troubleshooting
 
